@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile - Secure Event App{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: auto;">
+    <h2>User Profile</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success" style="margin-top: 1rem;">Update Profile</button>
+    </form>
+
+    <hr style="margin: 2rem 0; border: 0; border-top: 1px solid var(--border);">
+
+    <h3>Account Actions</h3>
+    <p>
+        <a href="{% url 'password_change' %}" class="btn btn-secondary">Change Password</a>
+    </p>
+</div>
+{% endblock %}

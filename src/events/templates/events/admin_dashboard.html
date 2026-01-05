@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - Secure Event App{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 3rem;">
+    <h1
+        style="font-size: 2.5rem; font-weight: 700; background: linear-gradient(135deg, #1e293b 0%, #475569 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        Dashboard
+    </h1>
+    <p style="color: var(--text-muted); font-size: 1.1rem;">Overview of all events and registrations.</p>
+</div>
+
+<!-- Stats Cards -->
+<div
+    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+    <div class="card" style="padding: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+        <div style="background: rgba(79, 70, 229, 0.1); padding: 1rem; border-radius: 12px; color: var(--primary);">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+        </div>
+        <div>
+            <div style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase;">Total
+                Events</div>
+            <div style="font-size: 1.5rem; font-weight: 700; color: var(--text-main);">{{ total_events }}</div>
+        </div>
+    </div>
+
+    <div class="card" style="padding: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+        <div style="background: rgba(236, 72, 153, 0.1); padding: 1rem; border-radius: 12px; color: var(--accent);">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+        </div>
+        <div>
+            <div style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase;">Total
+                Attendees</div>
+            <div style="font-size: 1.5rem; font-weight: 700; color: var(--text-main);">{{ total_registrations }}</div>
+        </div>
+    </div>
+</div>
+
+{% for event in events %}
+<div class="card">
+    <div
+        style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border);">
+        <div>
+            <h3 style="margin-bottom: 0.5rem; color: var(--primary);">{{ event.title }}</h3>
+            <div style="font-size: 0.9rem; color: var(--text-muted);">
+                📅 {{ event.start_at|date:"M d, Y, h:i A" }} &nbsp;
+                📍 {{ event.location|default:"Online" }}
+            </div>
+        </div>
+        <div style="text-align: right; display: flex; align-items: center; gap: 1rem;">
+            <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                {{ event.registrations.count }} / {{ event.capacity }} Registered
+            </span>
+            <a href="{% url 'event_update' event.id %}"
+                style="text-decoration: none; background: rgba(79, 70, 229, 0.1); color: var(--primary); border: 1px solid rgba(79, 70, 229, 0.2); padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600;">Edit
+                Event</a>
+            <form action="{% url 'event_delete' event.id %}" method="POST"
+                onsubmit="return confirm('Are you sure you want to delete this event? This cannot be undone.');"
+                style="margin: 0;">
+                {% csrf_token %}
+                <button type="submit"
+                    style="background: rgba(239, 68, 68, 0.1); color: var(--error); border: 1px solid rgba(239, 68, 68, 0.2); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600;">Delete
+                    Event</button>
+            </form>
+        </div>
+    </div>
+
+    {% if event.registrations.count > 0 %}
+    <div class="table-responsive">
+        <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
+            <thead>
+                <tr>
+                    <th style="font-size: 0.85rem; text-transform: uppercase;">Name</th>
+                    <th style="font-size: 0.85rem; text-transform: uppercase;">Email</th>
+                    <th style="font-size: 0.85rem; text-transform: uppercase;">Registered At</th>
+                    <th style="font-size: 0.85rem; text-transform: uppercase; text-align: right;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reg in event.registrations.all %}
+                <tr style="font-size: 0.95rem;">
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); font-weight: 500;">
+                        {{ reg.name }}
+                    </td>
+                    <td
+                        style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); color: var(--text-muted);">
+                        {{ reg.email }}
+                    </td>
+                    <td
+                        style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); color: var(--text-muted);">
+                        {{ reg.registered_at|date:"M d, h:i A" }}
+                    </td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); text-align: right;">
+                        <form action="{% url 'registration_delete' reg.id %}" method="POST"
+                            onsubmit="return confirm('Remove {{ reg.name }} from this event?');"
+                            style="margin: 0; display: inline;">
+                            {% csrf_token %}
+                            <button type="submit"
+                                style="background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0.25rem;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                    style="display: block; transition: color 0.2s;">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path
+                                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                    </path>
+                                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                                </svg>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p style="text-align: center; color: var(--text-muted); padding: 1rem; font-style: italic;">
+        No registrations yet.
+    </p>
+    {% endif %}
+</div>
+{% empty %}
+<div class="card" style="text-align: center; color: var(--text-muted);">
+    <p>No events found.</p>
+</div>
+{% endfor %}
+
+{% endblock %}

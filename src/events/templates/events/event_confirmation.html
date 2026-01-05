@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirmation - Secure Event App{% endblock %}
+
+{% block content %}
+<div style="text-align: center; padding: 40px;">
+    <h2 style="color: #28a745;">Registration Confirmed!</h2>
+    <p>You have successfully registered for <strong>{{ event.title }}</strong>.</p>
+    <div
+        style="margin-top: 2rem; background: rgba(255,255,255,0.5); padding: 1.5rem; border-radius: 12px; display: inline-block; text-align: left;">
+        <p style="margin: 0.5rem 0; color: var(--text-main);">
+            <strong>Event Date:</strong> {{ event.start_at|date:"D, d M Y, h:i A" }}
+        </p>
+        <p style="margin: 0.5rem 0; color: var(--text-main);">
+            <strong>Location:</strong> {{ event.location|default:"Online" }}
+        </p>
+        {% if registration %}
+        <p
+            style="margin: 0.5rem 0; color: var(--primary); border-top: 1px solid rgba(0,0,0,0.1); padding-top: 0.5rem; margin-top: 0.5rem;">
+            <strong>Registered On:</strong> {{ registration.registered_at|date:"D, d M Y, h:i A" }}
+        </p>
+        {% endif %}
+    </div>
+
+    <div style="margin-top: 20px;">
+        <a href="{% url 'event_list' %}"
+            style="background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Back
+            to Events</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Audit Logs - Secure Event App{% endblock %}
+
+{% block content %}
+<h2>Security Audit Logs</h2>
+<div class="card">
+    <div class="table-responsive">
+        <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
+            <thead>
+                <tr>
+                    <th
+                        style="background: rgba(0,0,0,0.02); padding: 1rem; border-bottom: 2px solid var(--border); width: 20%;">
+                        Time</th>
+                    <th
+                        style="background: rgba(0,0,0,0.02); padding: 1rem; border-bottom: 2px solid var(--border); width: 15%;">
+                        User</th>
+                    <th
+                        style="background: rgba(0,0,0,0.02); padding: 1rem; border-bottom: 2px solid var(--border); width: 15%;">
+                        Action</th>
+                    <th
+                        style="background: rgba(0,0,0,0.02); padding: 1rem; border-bottom: 2px solid var(--border); width: 15%;">
+                        IP Address</th>
+                    <th style="background: rgba(0,0,0,0.02); padding: 1rem; border-bottom: 2px solid var(--border);">
+                        Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr style="transition: background 0.2s;">
+                    <td
+                        style="padding: 1rem; border-bottom: 1px solid var(--border); color: var(--text-muted); font-size: 0.9rem; font-family: monospace;">
+                        {{ log.timestamp|date:"Y-m-d H:i:s" }}
+                    </td>
+                    <td style="padding: 1rem; border-bottom: 1px solid var(--border); font-weight: 600;">
+                        {{ log.user.username|default:"Anonymous" }}
+                    </td>
+                    <td style="padding: 1rem; border-bottom: 1px solid var(--border);">
+                        {% if 'Login' in log.action %}
+                        <span
+                            style="background: rgba(79, 70, 229, 0.1); color: var(--primary); padding: 0.25rem 0.75rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600;">{{
+                            log.action }}</span>
+                        {% elif 'Logout' in log.action %}
+                        <span
+                            style="background: rgba(100, 116, 139, 0.1); color: var(--text-muted); padding: 0.25rem 0.75rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600;">{{
+                            log.action }}</span>
+                        {% elif 'Failed' in log.action %}
+                        <span
+                            style="background: rgba(239, 68, 68, 0.1); color: var(--error); padding: 0.25rem 0.75rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600;">{{
+                            log.action }}</span>
+                        {% else %}
+                        <span
+                            style="background: rgba(236, 72, 153, 0.1); color: var(--accent); padding: 0.25rem 0.75rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600;">{{
+                            log.action }}</span>
+                        {% endif %}
+                    </td>
+                    <td
+                        style="padding: 1rem; border-bottom: 1px solid var(--border); color: var(--text-muted); font-family: monospace;">
+                        {{ log.ip_address }}
+                    </td>
+                    <td style="padding: 1rem; border-bottom: 1px solid var(--border); color: var(--text-main);">
+                        {{ log.details }}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="padding: 3rem; text-align: center; color: var(--text-muted);">
+                        No security logs found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

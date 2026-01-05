@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Events - Secure Event App{% endblock %}
+
+{% block content %}
+<div style="text-align: center; margin-bottom: 4rem; padding: 2rem 0;">
+    <h1
+        style="font-size: 3.5rem; font-weight: 700; background: linear-gradient(135deg, #1e293b 0%, #475569 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1rem;">
+        Exclusive Events
+    </h1>
+    <p style="color: var(--text-muted); font-size: 1.2rem; max-width: 600px; margin: auto; margin-bottom: 2rem;">
+        Secure your spot at the world's most prestigious gatherings.
+    </p>
+
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <span
+            style="background: rgba(79, 70, 229, 0.1); color: var(--primary); padding: 0.5rem 1rem; border-radius: 50px; font-weight: 600; font-size: 0.9rem; border: 1px solid rgba(79, 70, 229, 0.2);">🔥
+            Trending</span>
+        <span
+            style="background: rgba(236, 72, 153, 0.1); color: var(--accent); padding: 0.5rem 1rem; border-radius: 50px; font-weight: 600; font-size: 0.9rem; border: 1px solid rgba(236, 72, 153, 0.2);">💎
+            VIP Access</span>
+        <span
+            style="background: rgba(16, 185, 129, 0.1); color: var(--success); padding: 0.5rem 1rem; border-radius: 50px; font-weight: 600; font-size: 0.9rem; border: 1px solid rgba(16, 185, 129, 0.2);">🔒
+            Secure</span>
+    </div>
+    {% if user.is_authenticated and user.is_superuser %}
+    <div style="margin-top: 2rem;">
+        <a href="{% url 'event_create' %}" class="btn">Create New Event</a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="grid-events">
+    {% for event in events %}
+    <div class="event-card">
+        <h3>{{ event.title }}</h3>
+        <div class="event-meta">
+            📅 {{ event.start_at|date:"M d, Y, h:i A" }} <br>
+            📍 {{ event.location|default:"Online" }}
+        </div>
+        <div class="event-desc">
+            {{ event.description|truncatewords:20 }}
+        </div>
+        <div class="event-actions" style="margin-top: auto; padding-top: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <span style="font-size: 0.85rem; color: var(--text-muted);">
+                    <strong>{{ event.seats_left }}</strong> / {{ event.capacity }} seats left
+                </span>
+            </div>
+            <a href="{% url 'event_register' event.id %}" class="btn" style="width: 100%; display: block;">Details &
+                Register</a>
+        </div>
+    </div>
+    {% empty %}
+    <div class="card" style="grid-column: 1 / -1; text-align: center; color: var(--text-muted);">
+        <p>No upcoming events found.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
